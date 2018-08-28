@@ -1,0 +1,6 @@
+com\hunt\util\PlatformCode.class
+com\hunt\util\StringUtil.class
+com\hunt\util\ResponseCode.class
+com\hunt\util\Result.class
+com\hunt\util\DataStatus.class
+com\hunt\util\SystemConstant.class
