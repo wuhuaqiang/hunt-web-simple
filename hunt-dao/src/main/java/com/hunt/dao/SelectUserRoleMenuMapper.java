@@ -2,6 +2,7 @@ package com.hunt.dao;
 
 import com.hunt.model.entity.SysUserRoleMenu;
 import com.hunt.model.entity.SystemUserRole;
+import com.hunt.model.entity.SystemUserUrlPermission;
 
 import java.util.List;
 
@@ -24,6 +25,13 @@ public interface SelectUserRoleMenuMapper {
      * @return
      */
    public List<SystemUserRole> queryUserRoleList(Long id);
+
+    /**
+     * 根据用户id查询用户的权限Url
+     * @param id
+     * @return
+     */
+    public List<SystemUserUrlPermission> queryUserUrlList(Long id);
 
 
 }

@@ -58,5 +58,33 @@
         AND syspg.status = 1
         AND sysp.status = 1
     </select>
-
+    <resultMap id="SystemUserUrlPermission" type="com.hunt.model.entity.SystemUserUrlPermission">
+        <result column="name" property="roleName"/>
+        <result column="id" property="roleId"/>
+        <result column="CODE" property="roleCode"/>
+        <result column="SYS_PERMISSION_GROUP_ID" property="sysPermissionGroupId"/>
+        <result column="IS_FINAL" property="isFinal"/>
+        <result column="REQUEST_URL" property="requestUrl"/>
+    </resultMap>
+    <!--查詢用戶的Url-->
+    <select id="queryUserUrlList" parameterType="long" resultMap="SystemUserUrlPermission">
+    SELECT
+       distinct sysp.name,
+        sysp.id,
+        sysp.CODE,
+        sysp.SYS_PERMISSION_GROUP_ID,
+        sysp.IS_FINAL,
+        sysp.REQUEST_URL
+    FROM
+        sys_user sur
+        LEFT JOIN sys_user_role sysur ON sur.id = sysur.sys_user_id
+        left join SYS_ROLE_PERMISSION sysrp on sysrp.SYS_ROLE_ID= sysur.SYS_ROLE_ID
+        LEFT JOIN sys_permission sysp ON sysp.id = sysrp.SYS_PERMISSION_ID
+        LEFT JOIN sys_permission_group syspg ON syspg.id = sysp.sys_permission_group_id
+    WHERE
+        sur.id = #{id}
+        AND sysur.status = 1
+        AND syspg.status = 1
+        AND sysp.status = 1
+    </select>
 </mapper>
