@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Auther: cwx
@@ -46,6 +47,7 @@ public class SelectUserRoleMenuSerivelmpl implements SelectUserRoleMenuService {
 
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+    private static final long timeout = 2592000;
 
     /**
      * 获取用户的菜单结果list
@@ -63,6 +65,7 @@ public class SelectUserRoleMenuSerivelmpl implements SelectUserRoleMenuService {
                 redisTemplate.opsForSet().add(sessionId + "_Permission", requestUrl);
             }
         }
+        redisTemplate.expire(sessionId + "_Permission",timeout, TimeUnit.SECONDS);
         return MyBeanUtils.copyPropertiesList(selectUserRoleMenuMapper.selectUserRoleMenu(id), SysUserRoleMenuDto.class);
     }
 

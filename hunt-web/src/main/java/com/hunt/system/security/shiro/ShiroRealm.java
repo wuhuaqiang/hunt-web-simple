@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: ouyangan
@@ -50,6 +51,7 @@ public class ShiroRealm extends AuthorizingRealm {
     private SysRolePermissionMapper sysRolePermissionMapper;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+    private static final long timeout = 2592000;
 
     /**
      * 鉴权信息
@@ -98,6 +100,7 @@ public class ShiroRealm extends AuthorizingRealm {
             }
 
         }
+        redisTemplate.expire(sessionId + "_Permission",timeout, TimeUnit.SECONDS);
         info.addRoles(roles);
         info.addStringPermissions(permissions);
         log.debug("角色信息: \n {}", roles.toString());
