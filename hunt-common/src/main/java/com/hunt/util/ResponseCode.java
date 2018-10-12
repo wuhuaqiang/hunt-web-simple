@@ -28,7 +28,7 @@ public enum ResponseCode {
     account_expiration(30009,"帐号已过期"),
     oldpassword_error(30010,"旧密码验证错误"),
     old_new_password_error(30011,"新密码不能与旧密码相同"),
-    lock_account(30012,"由于密码输入错误次数大于5次，帐号已经禁止登录！");
+    lock_account(30012,"由于用户名或密码输入错误次数大于10次，帐号已锁定！");
 
     private int code;
     private String msg;

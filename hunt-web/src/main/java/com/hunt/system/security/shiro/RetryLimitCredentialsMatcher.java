@@ -36,20 +36,20 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
                 opsForValue.set("longinCount" + username, Integer.parseInt(longinCount) + 1 + "");
             }
             //计数大于5时，设置用户被锁定一小时
-            if (Integer.parseInt(opsForValue.get("longinCount" + username)) >= 5) {
+            if (Integer.parseInt(opsForValue.get("longinCount" + username)) >= 10) {
                 opsForValue.set("longinLock" + username, "LOCK");
-                redisTemplate.expire("longinLock" + username, 1, TimeUnit.HOURS);
+                redisTemplate.expire("longinLock" + username, 20, TimeUnit.MINUTES);
             }
         }
         if ("LOCK".equals(opsForValue.get("longinLock" + username))) {
-            throw new ExcessiveAttemptsException("由于密码输入错误次数大于5次，帐号已经禁止登录！");
+            throw new ExcessiveAttemptsException("由于用户名或密码输入错误次数大于10次，帐号已锁定！");
         }
         boolean matches = super.doCredentialsMatch(token, info);
         if (matches) {
             //清空登录计数
             opsForValue.set("longinCount" + username, "0");
-        }else{
-            throw new IllegalStateException("帐号或密码输入错误次数大于5次，帐号将禁止登录，目前已输错"+opsForValue.get("longinCount" + username)+"次");
+        } else {
+            throw new IllegalStateException("用户名或密码不正确，再失败" + (10 - Integer.parseInt(opsForValue.get("longinCount" + username))) + "次,将锁定帐号");
         }
         return matches;
     }
