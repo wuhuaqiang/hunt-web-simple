@@ -1,5 +1,6 @@
 package com.hunt.system.security.shiro;
 
+import com.hunt.system.exception.PasswordErrorException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
@@ -47,6 +48,8 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
         if (matches) {
             //清空登录计数
             opsForValue.set("longinCount" + username, "0");
+        }else{
+            throw new IllegalStateException("帐号或密码输入错误次数大于5次，帐号将禁止登录，目前已输错"+opsForValue.get("longinCount" + username)+"次");
         }
         return matches;
     }

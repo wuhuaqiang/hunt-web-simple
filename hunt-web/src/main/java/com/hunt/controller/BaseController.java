@@ -98,7 +98,10 @@ public class BaseController {
                 //其他错误
             } else if (exception.getCause() != null && exception.getCause() instanceof ExcessiveAttemptsException){
                 result = Result.instance(ResponseCode.lock_account.getCode(), ResponseCode.lock_account.getMsg());
+            }else if(exception.getCause().getCause() != null && exception.getCause().getCause() instanceof IllegalStateException){
+                result = Result.instance(1002000, exception.getCause().getCause().getMessage());
             }
+            System.out.println(exception.getCause().getCause());
             //调试时输出异常日志
       /*      if (systemService.selectDataItemByKey("error_detail", 2).equals("true")) {
                 result.setData(StringUtil.exceptionDetail(exception));
