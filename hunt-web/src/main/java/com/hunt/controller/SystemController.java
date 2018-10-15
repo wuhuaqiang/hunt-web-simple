@@ -115,26 +115,27 @@ public class SystemController extends BaseController {
             sysLoginlog.setIssuccess("0");
             sysLoginlog.setLogtype("登录");
             sysLoginlogService.insert(sysLoginlog);
-            String username = loginName;
-            //访问一次，计数一次
-            ValueOperations<String, String> opsForValue = redisTemplateStr.opsForValue();
-            if (!"LOCK".equals(opsForValue.get("longinLock" + username))) {
-                String longinCount = opsForValue.get("longinCount" + username);
-                if (longinCount == null) {
-                    opsForValue.set("longinCount" + username, "1");
-                } else {
-                    opsForValue.set("longinCount" + username, Integer.parseInt(longinCount) + 1 + "");
-                }
-                //计数大于5时，设置用户被锁定一小时
-                if (Integer.parseInt(opsForValue.get("longinCount" + username)) >= 10) {
-                    opsForValue.set("longinLock" + username, "LOCK");
-                    redisTemplate.expire("longinLock" + username, 20, TimeUnit.MINUTES);
-                }
-            }
-            if ("LOCK".equals(opsForValue.get("longinLock" + username))) {
+//            String username = loginName;
+//            //访问一次，计数一次
+//            ValueOperations<String, String> opsForValue = redisTemplateStr.opsForValue();
+//            if (!"LOCK".equals(opsForValue.get("longinLock" + username))) {
+//                String longinCount = opsForValue.get("longinCount" + username);
+//                if (longinCount == null) {
+//                    opsForValue.set("longinCount" + username, "1");
+//                } else {
+//                    opsForValue.set("longinCount" + username, Integer.parseInt(longinCount) + 1 + "");
+//                }
+//                //计数大于5时，设置用户被锁定一小时
+//                if (Integer.parseInt(opsForValue.get("longinCount" + username)) >= 10) {
+//                    opsForValue.set("longinLock" + username, "LOCK");
+//                    redisTemplate.expire("longinLock" + username, 20, TimeUnit.MINUTES);
+//                }
+//            }
+          /*  if ("LOCK".equals(opsForValue.get("longinLock" + username))) {
                 throw new ExcessiveAttemptsException("由于用户名或密码输入错误次数大于10次，帐号已锁定！");
-            }
-            String msg = "用户名或密码不正确，再失败" + (10 - Integer.parseInt(opsForValue.get("longinCount" + username))) + "次,将锁定帐号!";
+            }*/
+           // String msg = "用户名或密码不正确，再失败" + (10 - Integer.parseInt(opsForValue.get("longinCount" + username))) + "次,将锁定帐号!";
+            String msg = "用户名或密码不正确";
 //            return Result.instance(ResponseCode.unknown_account.getCode(), ResponseCode.unknown_account.getMsg());
             return Result.instance(ResponseCode.unknown_account.getCode(), msg);
         }
