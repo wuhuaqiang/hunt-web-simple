@@ -35,6 +35,7 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
             } else {
                 opsForValue.set("longinCount" + username, Integer.parseInt(longinCount) + 1 + "");
             }
+            redisTemplate.expire("longinCount" + username, 24, TimeUnit.HOURS);
             //计数大于5时，设置用户被锁定一小时
             if (Integer.parseInt(opsForValue.get("longinCount" + username)) >= 10) {
                 opsForValue.set("longinLock" + username, "LOCK");
