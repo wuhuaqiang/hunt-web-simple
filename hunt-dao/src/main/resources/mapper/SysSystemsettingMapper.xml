@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hunt.dao.SysSystemsettingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hunt.model.entity.SysSystemsetting">
+        <result column="VISITSTARTTIME" property="visitstarttime"/>
+        <result column="VISITENDTIME" property="visitendtime"/>
+        <result column="IPLIST" property="iplist"/>
+        <result column="TXTEMAILADDR" property="txtemailaddr"/>
+        <result column="TXTEMAILPORT" property="txtemailport"/>
+        <result column="TXTEMAILUSERNAME" property="txtemailusername"/>
+        <result column="TXTEMAILPWD" property="txtemailpwd"/>
+        <result column="TXTLOGINFALSECOUNT" property="txtloginfalsecount"/>
+        <result column="TXTLOGINLOCKTIME" property="txtloginlocktime"/>
+        <result column="TXTEDITPWDTIME" property="txteditpwdtime"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+        <result column="CREATE_BY" property="createBy"/>
+        <result column="UPDATE_BY" property="updateBy"/>
+        <result column="RANK" property="rank"/>
+        <result column="TXTSESSIONMAXTIME" property="txtsessionmaxtime"/>
+        <result column="TXTSESSIONMAXCOUNT" property="txtsessionmaxcount"/>
+        <result column="SYS_SYSTEMSETTING_ID" property="sysSystemsettingId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        VISITSTARTTIME, VISITENDTIME, IPLIST, TXTEMAILADDR, TXTEMAILPORT, TXTEMAILUSERNAME, TXTEMAILPWD, TXTLOGINFALSECOUNT, TXTLOGINLOCKTIME, TXTEDITPWDTIME, CREATE_TIME, UPDATE_TIME, CREATE_BY, UPDATE_BY, RANK, TXTSESSIONMAXTIME, TXTSESSIONMAXCOUNT, SYS_SYSTEMSETTING_ID
+    </sql>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM SYS_SYSTEMSETTING
+    </select>
+
+</mapper>

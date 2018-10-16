@@ -97,7 +97,7 @@ public class BaseController {
                 result = Result.instance(ResponseCode.forbidden_ip.getCode(), ResponseCode.forbidden_ip.getMsg());
                 //其他错误
             } else if (exception.getCause() != null && exception.getCause() instanceof ExcessiveAttemptsException){
-                result = Result.instance(ResponseCode.lock_account.getCode(), ResponseCode.lock_account.getMsg());
+                result = Result.instance(ResponseCode.lock_account.getCode(), exception.getCause().getMessage());
             }else if(exception.getCause().getCause() != null && exception.getCause().getCause() instanceof IllegalStateException){
                 result = Result.instance(1002000, exception.getCause().getCause().getMessage());
             }

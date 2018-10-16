@@ -1,14 +1,11 @@
 package com.hunt.controller;
 
 import com.hunt.model.entity.*;
-import com.hunt.service.SysLoginRecordsService;
-import com.hunt.service.SysLoginlogService;
+import com.hunt.service.*;
 import com.hunt.system.security.geetest.GeetestConfig;
 import com.hunt.system.security.geetest.GeetestLib;
 import com.hunt.model.dto.LoginInfo;
 import com.hunt.model.dto.PageInfo;
-import com.hunt.service.SysUserService;
-import com.hunt.service.SystemService;
 import com.hunt.tools.CaptchaImgCreater;
 import com.hunt.tools.Constant;
 import com.hunt.tools.IPHelper;
@@ -41,6 +38,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +61,8 @@ public class SystemController extends BaseController {
     private SysLoginlogService sysLoginlogService;
     @Autowired
     private SysLoginRecordsService sysLoginRecordsService;
+    @Autowired
+    private SysSystemsettingService sysSystemsettingService;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
     @Autowired
@@ -93,6 +93,28 @@ public class SystemController extends BaseController {
     @RequestMapping(value = "login", method = RequestMethod.POST, produces = "application/json")
     public Result login(@RequestBody Map<String, Object> params,
                         HttpServletRequest request) throws Exception {
+        List<SysSystemsetting> sysSystemsettings = sysSystemsettingService.selectAll();
+        if (sysSystemsettings.size() > 0) {
+            SysSystemsetting sysSystemsetting = sysSystemsettings.get(0);
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+            Date visitstarttime = sysSystemsetting.getVisitstarttime();
+            Date visitendtime = sysSystemsetting.getVisitendtime();
+            if (visitstarttime != null || visitendtime != null) {
+                String visitstarttimeStr = sdf.format(visitstarttime);
+                String visitendtimeStr = sdf.format(visitendtime);
+                LocalTime now = LocalTime.now();
+                System.out.println("*****************************************");
+                String s = now.toString();
+                String nowStr = s.substring(0, s.indexOf("."));
+                long visitstarttimeLon = Long.valueOf(visitstarttimeStr.replaceAll("[-\\s:]", ""));
+                long visitendtimeLon = Long.valueOf(visitendtimeStr.replaceAll("[-\\s:]", ""));
+                long nowLon = Long.valueOf(nowStr.replaceAll("[-\\s:]", ""));
+                Boolean result = visitstarttimeLon > nowLon || nowLon > visitendtimeLon;
+                if (result) {
+                    throw new ExcessiveAttemptsException("系统管理设置系统在:" + visitstarttimeStr + "-" + visitendtimeStr + "时间段才能被访问！");
+                }
+            }
+        }
        /* //极限验证二次服务验证
         if (!verifyCaptcha(request)) {
             return Result.instance(ResponseCode.verify_captcha_error.getCode(), ResponseCode.verify_captcha_error.getMsg());
@@ -134,7 +156,7 @@ public class SystemController extends BaseController {
           /*  if ("LOCK".equals(opsForValue.get("longinLock" + username))) {
                 throw new ExcessiveAttemptsException("由于用户名或密码输入错误次数大于10次，帐号已锁定！");
             }*/
-           // String msg = "用户名或密码不正确，再失败" + (10 - Integer.parseInt(opsForValue.get("longinCount" + username))) + "次,将锁定帐号!";
+            // String msg = "用户名或密码不正确，再失败" + (10 - Integer.parseInt(opsForValue.get("longinCount" + username))) + "次,将锁定帐号!";
             String msg = "用户名或密码不正确";
 //            return Result.instance(ResponseCode.unknown_account.getCode(), ResponseCode.unknown_account.getMsg());
             return Result.instance(ResponseCode.unknown_account.getCode(), msg);
