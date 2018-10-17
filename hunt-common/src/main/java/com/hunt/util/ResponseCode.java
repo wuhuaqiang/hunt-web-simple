@@ -9,7 +9,7 @@ public enum ResponseCode {
     success(10000, "操作成功"),
     error(20000, "服务器错误"),
     unknown_account(20001, "账户不存在"),
-    forbidden_account(20002, "账户已禁用"),
+    forbidden_account(20002, "账户已休眠"),
     password_incorrect(20003, "密码错误"),
     verify_captcha_error(20004, "验证码错误,请重新刷新并滑动验证码!"),
     unauthorized(20005, "无操作权限"),
