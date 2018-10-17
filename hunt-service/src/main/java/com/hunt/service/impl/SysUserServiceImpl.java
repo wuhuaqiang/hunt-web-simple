@@ -117,22 +117,27 @@ public class SysUserServiceImpl implements SysUserService {
         List<SysUser> sysUsers = sysUserMapper.selectAll(sort, order, loginName, zhName, email, phone, address);
         List<SysUserDto> sysUserDtos = new ArrayList<>();
         for (SysUser user : sysUsers) {
-            SysUserDto userDto = new SysUserDto();
-            BeanUtils.copyProperties(user, userDto);
-            userDto.setPassword("");
-            userDto.setPasswordSalt("");
-            List<SysUserPermission> userPermissions = sysUserPermissionMapper.selectByUserId(user.getId());
-            List<SysPermission> permissions = new ArrayList<>();
-            for (SysUserPermission userPermission : userPermissions) {
-                SysPermission sysPermission = sysPermissionMapper.selectById(userPermission.getSysPermissionId());
-                permissions.add(sysPermission);
+            if (user.getExpiryTime().getTime() != -28800000 && user.getExpiryTime().getTime() <= System.currentTimeMillis() - 86400000) {
+                user.setStatus(2);
+                sysUserMapper.update(user);
+            } else {
+                SysUserDto userDto = new SysUserDto();
+                BeanUtils.copyProperties(user, userDto);
+                userDto.setPassword("");
+                userDto.setPasswordSalt("");
+                List<SysUserPermission> userPermissions = sysUserPermissionMapper.selectByUserId(user.getId());
+                List<SysPermission> permissions = new ArrayList<>();
+                for (SysUserPermission userPermission : userPermissions) {
+                    SysPermission sysPermission = sysPermissionMapper.selectById(userPermission.getSysPermissionId());
+                    permissions.add(sysPermission);
+                }
+                /*List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());*/
+                List<SysRole> sysRoles = sysRoleMapper.selectByUserId(user.getId());
+                userDto.setSysRoles(sysRoles);
+                userDto.setPermissions(permissions);
+                /*userDto.setUserRoleOrganizations(userRoleOrganizations);*/
+                sysUserDtos.add(userDto);
             }
-            /*List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());*/
-            List<SysRole> sysRoles = sysRoleMapper.selectByUserId(user.getId());
-            userDto.setSysRoles(sysRoles);
-            userDto.setPermissions(permissions);
-            /*userDto.setUserRoleOrganizations(userRoleOrganizations);*/
-            sysUserDtos.add(userDto);
         }
         PageInfo pageInfo = new PageInfo(counts, sysUserDtos);
         return pageInfo;
