@@ -121,7 +121,8 @@ public class SystemController extends BaseController {
         }*/
         String sessionId = request.getSession().getId();
         System.out.println(sessionId);
-        String loginName = MD5Utils.md5LoginName((String) params.get("loginName"));
+//        String loginName = MD5Utils.md5LoginName((String) params.get("loginName"));
+        String loginName =(String) params.get("loginName");
         String password = (String) params.get("password");
         String platforms = (String) params.get("platforms");
         SysUser user = sysUserService.selectByLoginName(loginName);
