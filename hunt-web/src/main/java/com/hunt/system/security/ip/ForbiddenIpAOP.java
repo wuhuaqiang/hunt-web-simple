@@ -1,6 +1,8 @@
 package com.hunt.system.security.ip;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
+import com.hunt.dao.SysSystemsettingMapper;
+import com.hunt.model.entity.SysSystemsetting;
 import com.hunt.system.exception.ForbiddenIpException;
 import com.hunt.tools.IPHelper;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,6 +22,7 @@ import com.hunt.service.SystemService;
 import com.hunt.util.ResponseCode;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * ip拦截前置拦截器
@@ -34,10 +37,23 @@ public class ForbiddenIpAOP {
     @Autowired
     private SystemService systemService;
     @Autowired
+    private SysSystemsettingMapper sysSystemsettingMapper;
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     @Before("@within(org.springframework.web.bind.annotation.RequestMapping)")
     public void forbiddenIp() throws ForbiddenIpException {
+        List<SysSystemsetting> sysSystemsettings = sysSystemsettingMapper.selectAll();
+        if (sysSystemsettings.size() > 0) {
+            SysSystemsetting sysSystemsetting = sysSystemsettings.get(0);
+            String iplist = sysSystemsetting.getIplist();
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String ipAddress = IPHelper.getIpAddress(request);
+            boolean contains = iplist.contains(ipAddress);
+            if (!contains) {
+                throw new ForbiddenIpException(ResponseCode.forbidden_ip.getMsg());
+            }
+        }
         if ("true".equals(systemService.selectDataItemByKey("ip_forbidden", 3))) {
             Boolean ip_forbidden = redisTemplate.hasKey("ip_intercepter");
             if (!ip_forbidden && systemService.selectIPForbiddenStatus()) {

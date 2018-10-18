@@ -17,7 +17,7 @@ public enum ResponseCode {
     unauthorized(20005, "无操作权限"),
     can_not_edit(20006, "该条记录无法编辑"),
     unauthenticated(20007, "未登录"),
-    forbidden_ip(20008, "非法请求"),
+    forbidden_ip(20008, "IP地址不允许访问该网站"),// 非法请求
     not_found_url(20009, "url不存在"),
     param_format_error(30001, "参数格式错误"),
     missing_parameter(30002, "缺少参数"),
