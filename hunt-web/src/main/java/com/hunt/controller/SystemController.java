@@ -64,6 +64,8 @@ public class SystemController extends BaseController {
     @Autowired
     private SysSystemsettingService sysSystemsettingService;
     @Autowired
+    private SysLoginStatusService sysLoginStatusService;
+    @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
     @Autowired
     private RedisTemplate<String, String> redisTemplateStr;
@@ -122,7 +124,7 @@ public class SystemController extends BaseController {
         String sessionId = request.getSession().getId();
         System.out.println(sessionId);
 //        String loginName = MD5Utils.md5LoginName((String) params.get("loginName"));
-        String loginName =(String) params.get("loginName");
+        String loginName = (String) params.get("loginName");
         String password = (String) params.get("password");
         String platforms = (String) params.get("platforms");
         SysUser user = sysUserService.selectByLoginName(loginName);
@@ -241,8 +243,12 @@ public class SystemController extends BaseController {
         String ipAddress = IPHelper.getIpAddress(request);
         sysLoginlog.setLoginip(ipAddress);
         Object principal = SecurityUtils.getSubject().getPrincipal();
+
         Serializable sessionId = SecurityUtils.getSubject().getSession().getId();
         String loginName = (String) principal;
+        SysUser sysUser = sysUserService.selectByLoginName(loginName);
+        SysLoginStatus sysLoginStatus = sysLoginStatusService.selectSysLoginStatusByUserId(sysUser.getId(), 1);
+        sysLoginStatus.setStatus(2);
         sysLoginlog.setAccount(loginName);
         sysLoginlog.setAddtime(new Date());
         sysLoginlog.setLogintime(new Date());
@@ -253,8 +259,9 @@ public class SystemController extends BaseController {
         redisTemplate.opsForValue().getOperations().delete(sessionId + "_Permission");
         redisTemplate.opsForValue().getOperations().delete("shiro-cache-" + loginName);
         redisTemplate.opsForValue().getOperations().delete("longinCount" + loginName);
-        SecurityUtils.getSubject().logout();
+        sysLoginStatusService.updateSysLoginStatusByUserId(sysLoginStatus);
         sysLoginlogService.insert(sysLoginlog);
+        SecurityUtils.getSubject().logout();
         return Result.success();
     }
 
