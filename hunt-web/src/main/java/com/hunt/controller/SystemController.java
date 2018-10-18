@@ -1,48 +1,40 @@
 package com.hunt.controller;
 
+import com.hunt.model.dto.LoginInfo;
+import com.hunt.model.dto.PageInfo;
 import com.hunt.model.entity.*;
 import com.hunt.service.*;
 import com.hunt.system.security.geetest.GeetestConfig;
 import com.hunt.system.security.geetest.GeetestLib;
-import com.hunt.model.dto.LoginInfo;
-import com.hunt.model.dto.PageInfo;
 import com.hunt.tools.CaptchaImgCreater;
-import com.hunt.tools.Constant;
 import com.hunt.tools.IPHelper;
-import com.hunt.tools.MD5Utils;
+import com.hunt.util.ResponseCode;
+import com.hunt.util.Result;
+import com.hunt.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.hunt.util.ResponseCode;
-import com.hunt.util.Result;
-import com.hunt.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.swing.*;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 系统功能模块
@@ -310,7 +302,7 @@ public class SystemController extends BaseController {
      * @param rows 分页大小
      * @return
      */
-    @ApiOperation(value = "在线用户列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
+    /*@ApiOperation(value = "在线用户列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
     @RequiresPermissions("user:loginStatu:list")
     @ResponseBody
     @RequestMapping(value = "online/list", method = RequestMethod.GET)
@@ -318,14 +310,53 @@ public class SystemController extends BaseController {
                                @RequestParam(defaultValue = "30") int rows) {
         PageInfo pageInfo = systemService.selectLogStatus(page, rows);
         return pageInfo;
+    }*/
+
+    /**
+     * 在线用户列表
+     *
+     * @param page 起始页码
+     * @param rows 分页大小
+     * @return
+     */
+    @ApiOperation(value = "在线用户列表", httpMethod = "POST", produces = "application/json", response = Result.class)
+    @RequiresPermissions("loginStatu:Query")
+    @ResponseBody
+    @RequestMapping(value = "online/list", method = RequestMethod.POST)
+    public Result onlineList(@RequestBody Map<String, Object> params, HttpServletRequest request) {
+        int page = Integer.valueOf((String) params.get("page"));
+        int rows = Integer.valueOf((String) params.get("rows"));
+        PageInfo pageInfo = systemService.selectLogStatus(page, rows);
+        return Result.success(pageInfo);
     }
+
 
     /**
      * 强制用户下线
      *
-     * @param userIds 用户ids
+     * @param params
      * @return
      */
+    @ApiOperation(value = "强制用户下线", httpMethod = "POST", produces = "application/json", response = Result.class)
+    @RequiresPermissions("loginStatu:Remove")
+    @ResponseBody
+    @RequestMapping(value = "forceLogout", method = RequestMethod.POST)
+    public Result forceLogout(@RequestBody Map<String, Object> params) {
+        String userIds = (String) params.get("userIds");
+        System.out.println("userIds = [" + userIds + "]");
+        String[] ids = userIds.split(",");
+        for (String id : ids) {
+            systemService.forceLogout(Integer.valueOf(id));
+        }
+        return Result.success();
+    }
+
+    /* *//**
+     * 强制用户下线
+     *
+     * @param userIds 用户ids
+     * @return
+     *//*
     @ApiOperation(value = "强制用户下线", httpMethod = "GET", produces = "application/json", response = Result.class)
     @RequiresPermissions("user:loginout")
     @ResponseBody
@@ -337,7 +368,7 @@ public class SystemController extends BaseController {
             systemService.forceLogout(Integer.valueOf(id));
         }
         return Result.success();
-    }
+    }*/
 
     /**
      * 日志页面
