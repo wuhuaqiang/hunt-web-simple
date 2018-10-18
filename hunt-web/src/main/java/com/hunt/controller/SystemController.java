@@ -314,9 +314,7 @@ public class SystemController extends BaseController {
 
     /**
      * 在线用户列表
-     *
-     * @param page 起始页码
-     * @param rows 分页大小
+     * params
      * @return
      */
     @ApiOperation(value = "在线用户列表", httpMethod = "POST", produces = "application/json", response = Result.class)

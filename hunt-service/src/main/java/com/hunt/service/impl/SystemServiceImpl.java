@@ -60,6 +60,9 @@ public class SystemServiceImpl implements SystemService {
             redisTemplate.opsForValue().getOperations().delete(sysLoginStatus.getSessionId());
             //delete authrization cache
             redisTemplate.opsForValue().getOperations().delete(SystemConstant.shiro_cache_prefix + sysLoginStatus.getSysUserLoginName());
+            redisTemplate.opsForValue().getOperations().delete(sysLoginStatus.getSessionId() + "_Permission");
+            redisTemplate.opsForValue().getOperations().delete("shiro-cache-" + sysLoginStatus.getSysUserLoginName());
+            redisTemplate.opsForValue().getOperations().delete("longinCount" + sysLoginStatus.getSysUserLoginName());
         }
         log.debug("force logout userId : {}", userId);
     }
